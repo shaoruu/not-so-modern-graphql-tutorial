@@ -1,6 +1,6 @@
 # Modern GraphQL Tutorial
 
-After going through this tutorial, you will be able to:
+After this tutorial, you will be able to:
 
 - Create your own GraphQL schema
 - Serve backend endpoints for data fetching
@@ -151,14 +151,7 @@ These are the types of network requests that simply ask for data from the server
 
 Remember the example I showed you?
 
-Here I define the exact same query type `users` that I showed you. There are three important keys that I want to point out in this short GraphQL code:
-
-1. `type Query` v.s. `type User`
-   - Query is the type of the _outer-most layer_ in a GraphQL request, and User in this case is just a _user-defined_ type that can be used in the entire schema.
-2. `!` Exclamation marks after type names
-   - `!` in GraphQL means **non-nullable**, meaning that the data sent back cannot be null or undefined. For example, `[String!]!` represents a non-nullable list containing values of Strings that cannot be null.
-3. `(query: String)` after `users`
-   - Just like functions, GraphQL requests can have additional arguments. In this case the query `users` takes in `query` of type `String`. <small>Notice how there isn't a `!` after `String`. This means that the argument `query` is **optional**.</small>
+Here I define the exact same query type `users` that I showed you.
 
 ```graphql
 # src/schema.graphql
@@ -176,11 +169,16 @@ type User {
 }
 ```
 
-Above, I planned out the basic `users` query, including what types I want and which of them are nullable.
+There are three important keys that I want to point out in this short GraphQL code:
 
-This only tells GraphQLServer what the query _looks like_ though.
+1. `type Query` v.s. `type User`
+   - Query is the type of the _outer-most layer_ in a GraphQL request, and User in this case is just a _user-defined_ type that can be used in the entire schema.
+2. `!` Exclamation marks after type names
+   - `!` in GraphQL means **non-nullable**, meaning that the data sent back cannot be null or undefined. For example, `[String!]!` represents a non-nullable list containing values of Strings that cannot be null.
+3. `(query: String)` after `users`
+   - Just like functions, GraphQL requests can have additional arguments. In this case the query `users` takes in `query` of type `String`. <small>Notice how there isn't a `!` after `String`. This means that the argument `query` is **optional**.</small>
 
-So, below is where I use **resolvers** to define **HOW** the server should handle `users` requests.
+However, this only tells GraphQLServer what the query _looks like_ though. So, below is where I use **resolvers** to define **HOW** the server should handle any `users` requests.
 
 ```javascript
 // src/resolvers/Query.js
@@ -233,13 +231,6 @@ query {
 
 Now that you have a basic understanding of what queries are, Mutations are fairly easy to understand. Mutations are where you _mutate_ the data in the database. <small>note that I used a temporary file `db.js` as a database since the primary focus of this tutorial is GraphQL not databases.</small>
 
-There are only a few things worth noticing in this Mutation type specification:
-
-1. `type Mutation` v.s. previous `type Query`
-   - Later on when making GraphQL requests, use `mutation { }` instead of `query { }`
-2. new keyword `input`
-   - This is used for argument specifications. When arguments become long and nasty, it's best to extract them and define an input type.
-
 ```graphql
 # src/schema.graphql
 type Mutation {
@@ -253,7 +244,14 @@ input CreateUserInput {
 }
 ```
 
-With the `createUser` mutation specified above, all we're missing is the _resolver_ corresponding for it &darr;
+There are only a few things worth noticing in this Mutation type specification:
+
+1. `type Mutation` v.s. previous `type Query`
+   - Later on when making GraphQL requests, use `mutation { }` instead of `query { }`
+2. new keyword `input`
+   - This is used for argument specifications. When arguments become long and nasty, it's best to extract them and define an input type.
+
+Ok, with the `createUser` mutation specified above, all we're missing is the _resolver_ corresponding for it &darr;
 
 ```javasript
 // src/resolvers/Mutation.js
@@ -315,14 +313,6 @@ Think of GraphQL Subscriptions as YouTube subscriptions. Once you are subscribed
 
 With GraphQL Subscriptions, you can set up quote unquote "channels" on your endpoint with specified types of "content" that these "channels" post. Here's an example in my code of subscriptions on the comment section of a specific post:
 
-There are only two important key points I want to mention here:
-
-1. `type Subscription`
-   - New type! use `subscription { }` instead of `mutation { }` for outer-most layer.
-2. new keyword `enum`
-   - An enum specifies a set of **`Strings`** that you can use throughout your schema.
-   - When you define an Enum, you are basically defining a set of **fixed** Strings.
-
 ```graphql
 # src/schema.graphql
 type Subscription {
@@ -341,7 +331,15 @@ enum MutationType {
 }
 ```
 
-The resolver of GraphQL subscriptions are a bit trickier. Since you are now not only querying or mutating data, but actually setting up a websocket link between the client and the server, you need **pubsub** system on the server-side.
+There are only two important key points I want to mention here:
+
+1. `type Subscription`
+   - New type! use `subscription { }` instead of `mutation { }` for outer-most layer.
+2. new keyword `enum`
+   - An enum specifies a set of **`Strings`** that you can use throughout your schema.
+   - When you define an Enum, you are basically defining a set of **fixed** Strings.
+
+The resolver of GraphQL subscriptions is a bit trickier. Since you are now not only querying or mutating data, but actually setting up a websocket link between the client and the server, you need **pubsub** system on the server-side.
 
 Looking back to index.js, we can now clearly see the initialization of a `PubSub` instance. We then pass it into `context` option in the GraphQLServer.
 
@@ -374,8 +372,6 @@ Now you may wonder what the `context` option is for. If you look closely to reso
 
 However, the PubSub system isn't as easily set up as you thought. In order to set up _websocket channels_ for each GraphQL Subscription, you need to set up a required `Subscription` resolver like the one below.
 
-Here I directly destructure `db` and `pubsub` out of `context`, and extract `postId` from the original argument `arguments`. I then check if the post exists or not. If it doesn't, I throw an Error to the console. If it does exit, and here comes the tricky part, I create and return a `pubsub asyncIterator` with a specific tag of `comment ${postId}`. You can think of this with the YouTube subscription example. Creating an `asyncIterator` is like creating a new YouTube channel. Later on you can then post data onto `pubsub` with the specific _channel tag_, and the data will be broadcasted to all instances connected.
-
 ```javascript
 // src/resolvers/Subscription.js
 const Subscription = {
@@ -395,7 +391,9 @@ const Subscription = {
 export { Subscription as default }
 ```
 
-Here's a quick example of how GraphQL subscriptions work:
+Here I directly destructure `db` and `pubsub` out of `context`, and extract `postId` from the original argument `arguments`. I then check if the post exists or not. If it doesn't, I throw an Error to the console. If it does exit, and here comes the tricky part, I create and return a `pubsub asyncIterator` with a specific tag of `comment ${postId}`. You can think of this with the YouTube subscription example. Creating an `asyncIterator` is like creating a new YouTube channel. Later on you can then post data onto `pubsub` with the specific _channel tag_, and the data will be broadcasted to all instances connected.
+
+To sum up, here's a quick example of how GraphQL subscriptions work:
 
 ```graphql
 # subscription:
