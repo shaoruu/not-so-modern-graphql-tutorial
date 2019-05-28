@@ -36,7 +36,7 @@ An example would be: Say you are creating an Instagram-like app. When a user ope
 
 In this tutorial, I will teach you how to set up your own GraphQL API, write a simple GraphQL client, and start communication between backend and frontend.
 
-I will be using [graphql-yoga](https://github.com/prisma/graphql-yoga) for the backend service, and [apollo](https://github.com/prisma/graphql-yoga) for a simple client side.
+I will be using [graphql-yoga](https://github.com/prisma/graphql-yoga) for the backend service, and [apollo](https://github.com/apollographql/react-apollo) for a simple client side.
 
 ## Getting Started
 
