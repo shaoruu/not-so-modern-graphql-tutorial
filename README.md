@@ -3,9 +3,9 @@
 After this tutorial, you will be able to:
 
 - Create your own GraphQL schema
-- Serve backend endpoints for data fetching
-- Connect client to backend server
-- Fetch data from client side
+- Serve a backend API for data fetching
+- Start a simple react GraphQL client
+- Fetch data!
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ After this tutorial, you will be able to:
    - [Queries](#Queries)
    - [Mutations](#Mutations)
    - [Subscriptions](#Subscriptions)
-6. [Apollo Client](#Apollo-Client)
+6. [React-Apollo](#Apollo-Client)
 7. [Wrapping Up](#Wrapping-Up)
 8. [References](#References)
 
@@ -56,7 +56,7 @@ One awesome tool that comes with [graphql-yoga](https://github.com/prisma/graphq
 After cloning the repository, run `npm start` and navigate to http://localhost:4000 Don't worry. At this point it is normal to have zero clue about what the playground is all about. Pasted below is the process of setting up a simple GraphQLServer and serving it on port 4000. Disregard the imports as they will be discussed later on. All you have to know is that the following section of code sets you up with a working GraphQLServer.
 
 ```javascript
-// src/index.js
+// backend/src/index.js
 
 import { GraphQLServer, PubSub } from 'graphql-yoga'
 import db from './db'
@@ -154,7 +154,8 @@ Remember the example I showed you in the [Basic Syntax](#Basic-Syntax) section?
 Here I defined the exact same query type `users` that I showed you.
 
 ```graphql
-# src/schema.graphql
+# backend/src/schema.graphql
+
 type Query {
   users(query: String): [User!]!
 }
@@ -181,19 +182,20 @@ There are three important keys that I want to point out in this short GraphQL co
 However, this only tells GraphQLServer what the query _looks like_ though. So, below is where I use **resolvers** to define **HOW** the server should handle any `users` requests.
 
 ```javascript
-// src/resolvers/Query.js
+// backend/src/resolvers/Query.js
+
 users(parent, args, context, info) {
-    const { db } = context
+  const { db } = context
 
-    // Check if the optional `query` of type String is passed in.
-    if (!args.query) {
-        return db.users
-    }
+  // Check if the optional `query` of type String is passed in.
+  if (!args.query) {
+    return db.users
+  }
 
-    // Reaching here means `query` is defined -> filter the data passed back.
-    return db.users.filter((user) => {
-        return user.name.toLowerCase().includes(args.query.toLowerCase())
-    })
+  // Reaching here means `query` is defined -> filter the data passed back.
+  return db.users.filter((user) => {
+    return user.name.toLowerCase().includes(args.query.toLowerCase())
+  })
 }
 ```
 
@@ -232,7 +234,8 @@ query {
 Now that you have a basic understanding of what queries are, Mutations are fairly easy to understand. Mutations are where you _mutate_ the data in the database. <small>note that I used a temporary file `db.js` as a database since the primary focus of this tutorial is on GraphQL not on databases.</small>
 
 ```graphql
-# src/schema.graphql
+# backend/src/schema.graphql
+
 type Mutation {
   createUser(data: CreateUserInput!): User!
 }
@@ -254,27 +257,28 @@ There are only a few things worth noticing in this Mutation type specification:
 Ok, with the `createUser` mutation specified above, all we're missing is the _resolver_ corresponding for it &darr;
 
 ```javascript
-// src/resolvers/Mutation.js
+// backend/src/resolvers/Mutation.js
+
 createUser(parent, args, context, info) {
-    const { db } = context
+  const { db } = context
 
-    // Check if email is already taken in fake database
-    const emailTaken = db.users.some((user) => user.email === args.data.email)
+  // Check if email is already taken in fake database
+  const emailTaken = db.users.some((user) => user.email === args.data.email)
 
-    if (emailTaken) {
-        throw new Error('Email taken')
-    }
+  if (emailTaken) {
+    throw new Error('Email taken')
+  }
 
-    // Create new user object
-    const user = {
-        id: uuidv4(),
-        ...args.data
-    }
+  // Create new user object
+  const user = {
+    id: uuidv4(),
+    ...args.data
+  }
 
-    // Save (append) it to face database
-    db.users.push(user)
+  // Save (append) it to face database
+  db.users.push(user)
 
-    return user
+  return user
 }
 ```
 
@@ -314,7 +318,8 @@ Think of GraphQL Subscriptions as YouTube subscriptions. Once you are subscribed
 With GraphQL Subscriptions, you can set up quote unquote "channels" on your endpoint with specified types of "content" that these "channels" post. Once data is mutated, you can then "post" the data up to the channel, notifying whoever's subscribed. Here's an example in my code of subscriptions on the comment section of a specific post:
 
 ```graphql
-# src/schema.graphql
+# backend/src/schema.graphql
+
 type Subscription {
   comment(postId: ID!): CommentSubscriptionPayload!
 }
@@ -344,7 +349,8 @@ The resolver of GraphQL subscriptions is a bit trickier. Since you are now not o
 Looking back to index.js, we can now clearly see the initialization of a `PubSub` instance. We then pass it into `context` option in the GraphQLServer.
 
 ```javascript
-// src/index.js
+// backend/src/index.js
+
 import { GraphQLServer, PubSub } from 'graphql-yoga'
 
 // ...import...lots...of...files...
@@ -373,7 +379,8 @@ Now you may wonder what the `context` option is for. If you look closely to reso
 However, the PubSub system isn't as easily set up as you thought. In order to set up _websocket channels_ for each GraphQL Subscription, you need to set up a required `Subscription` resolver like the one below.
 
 ```javascript
-// src/resolvers/Subscription.js
+// backend/src/resolvers/Subscription.js
+
 const Subscription = {
   comment: {
     subscribe(parent, { postId }, { db, pubsub }, info) {
@@ -396,19 +403,20 @@ Here I directly destructure `db` and `pubsub` out of `context`, and extract `pos
 With the `pubsub` system set up, I can now broadcast data throughout all of my resolvers. For example, whenever a comment on a specific post is created, I want to post the comment data onto the comment's individual Subscription Channel. I can do that with the code below:
 
 ```javascript
-// src/resolvers/Mutation.js
+// backend/src/resolvers/Mutation.js
+
 ...
 const comment = {
-    id: uuidv4(),
-    ...args.data
+  id: uuidv4(),
+  ...args.data
 }
 
 // THIS IS WHERE I PUBLISH MY DATA TO THE CHANNEL
 pubsub.publish(`comment ${args.data.post}`, {
-    comment: {
-        mutation: 'CREATED',
-        data: comment
-    }
+  comment: {
+    mutation: 'CREATED',
+    data: comment
+  }
 })
 ...
 ```
@@ -461,11 +469,234 @@ mutation {
 
 ## Apollo Client
 
-### TODO
+In this example, I created an application that contains a form and a list of posts. The form allows you to use `GraphQL mutations` to create posts in the database, and the list of posts is fetched with a `GraphQL query`. This list is actually subscribed to any new posts, which means when the form creates a new post, the post gets saved in the database and sent back to the client spontaneously through a `GraphQL subscription`.
+
+![](https://i.imgur.com/EZOvDS4.png)
+
+Before I start explaining the magic behind this, I strongly recommend you read the [react-apollo](https://www.apollographql.com/docs/react/essentials/get-started) documentations. It is well documented, and you will definitely learn a lot from it.
+
+### Setting up Apollo client
+
+In order to connect to the backend API, you need to set up a _GraphQL client_ like so:
+
+```javascript
+// frontend/src/index.js
+
+import { ApolloClient, InMemoryCache } from 'apollo-boost'
+import { ApolloProvider } from 'react-apollo'
+import { split } from 'apollo-link'
+import { HttpLink } from 'apollo-link-http'
+import { WebSocketLink } from 'apollo-link-ws'
+import { getMainDefinition } from 'apollo-utilities
+
+// Create an http link:
+const httpLink = new HttpLink({
+  uri: 'http://localhost:4000/'
+})
+
+// Create a WebSocket link:
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:4000/`,
+  options: { reconnect: true }
+})
+
+// using the ability to split links, you can send data to each link
+// depending on what kind of operation is being sent
+const link = split(
+  // split based on operation type
+  ({ query }) => {
+    const definition = getMainDefinition(query)
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    )
+  },
+  wsLink,
+  httpLink
+)
+
+const client = new ApolloClient({
+  link,
+  cache: new InMemoryCache().restore({})
+})
+```
+
+The HTTP link (`httpLink`) is for queries and mutations, and the WebSocket link (`wsLink`) is for GraphQL subscriptions. With the `split` function, we can tell apart the types of GraphQL requests. We then send the request to different endpoints accordingly.
+
+### Querying and Subscribing
+
+Querying in [react-apollo](https://www.apollographql.com/docs/react/essentials/get-started) is pretty simple. All you have to do is pass a `gql` tagged string, which is exactly like what you would enter in GraphQL Playground, into a [`Query`](https://www.apollographql.com/docs/react/essentials/queries) component.
+
+```javascript
+// frontend/src/graphql/queries.js
+
+import { gql } from 'apollo-boost'
+
+export const POSTS_QUERY = gql`
+  query {
+    posts {
+      title
+      body
+      author {
+        name
+      }
+      published
+    }
+  }
+`
+
+// frontend/src/graphql/subscriptions.js
+
+export const POSTS_SUBSCRIPTION = gql`
+  subscription {
+    post {
+      mutation
+      data {
+        title
+        body
+        author {
+          name
+        }
+        published
+      }
+    }
+  }
+`
+```
+
+```jsx
+// frontend/src/containers/App/App.js
+
+let unsubscribe = null
+
+// ...
+
+<Query query={POSTS_QUERY}>
+  {({ loading, error, data, subscribeToMore }) => {
+    if (loading) return <p>Loading...</p>
+    if (error) return <p>Error :(((</p>
+
+    const posts = data.posts.map((post, id) => (
+      <Post data={post} key={id} />
+    ))
+    if (!unsubscribe)
+      unsubscribe = subscribeToMore({
+        document: POSTS_SUBSCRIPTION,
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev
+          const newPost = subscriptionData.data.post.data
+
+          return {
+            ...prev,
+            posts: [newPost, ...prev.posts]
+          }
+        }
+      })
+
+    return <div>{posts}</div>
+  }}
+</Query>
+```
+
+The function within the `Query` tag is defined to be the process you execute once the GraphQL request is fired. `data` represents the data received; `loading` is a boolean indicating whether the query is pending or not. Once the data is received, you can then return whatever you want to render with the data. One thing to notice is the `subscribeToMore` function.
+
+The [`subscribeToMore`](https://www.apollographql.com/docs/react/advanced/subscriptions#subscribe-to-more) function is what tells the GraphQL client to listen to any updates. Once an update is sent from backend through wsLink to the client, the `updateQuery` function in subscribeToMore gets executed. It basically takes the **cached** posts from the query, `prev`, append the freshly received post onto it, and put the `prev` cache back in place. (reason to the `unsubscribe` variable is explained [here](https://www.youtube.com/watch?v=GqIMNp7POJw).)
+
+### Mutating
+
+Mutating in Apollo is also very simple. The [`Mutation`](https://www.apollographql.com/docs/react/essentials/mutations) tag takes in a `gql` tagged mutation, and gives you a function that you can run every time you want to make mutation requests.
+
+```javascript
+// frontend/src/graphql/mutations.js
+
+import { gql } from 'apollo-boost'
+
+export const CREATE_POST_MUTATION = gql`
+  mutation createPost(
+    $title: String!
+    $body: String!
+    $published: Boolean!
+    $authorId: ID!
+  ) {
+    createPost(
+      data: {
+        title: $title
+        body: $body
+        published: $published
+        author: $authorId
+      }
+    ) {
+      title
+      body
+      author {
+        name
+      }
+      published
+    }
+  }
+`
+```
+
+The variables with names are just variables that you can pass into later on with the `variables` option. (you will see it later)
+
+```jsx
+// frontend/src/containers/App/App.js
+
+<Mutation mutation={CREATE_POST_MUTATION}>
+  {createPost => {
+    this.createPost = createPost
+
+    return (
+      /** FORM ELEMENT HERE */
+    )
+  }}
+</Mutation>
+```
+
+I purposely saved the createPost function generated by `Mutation` so I can use it later in `handleFormSubmit`. Don't forget to check out the source file to have a look at how I created the form.
+
+Last thing to do after setting up the mutation is to fire the mutation every time the form is submitted. This is exactly what `handleFormSubmit` does.
+
+```javascript
+// frontend/src/container/App/App.js
+
+handleFormSubmit = e => {
+  e.preventDefault()
+
+  const { formTitle, formBody } = this.state
+
+  if (!formTitle || !formBody) return
+
+  this.createPost({
+    variables: {
+      title: formTitle,
+      body: formBody,
+      published: true,
+      authorId: 2
+    }
+  })
+
+  this.setState({
+    formTitle: '',
+    formBody: ''
+  })
+}
+```
 
 ## Wrapping Up
 
+That's it! By now you should be able to:
+
+- Create your own GraphQL API
+- Set up GraphQL client and connect the client to backend
+- Fetch data and listen to data changes
+
+There are a lot more to learn about GraphQL such as [user authentication](https://www.apollographql.com/docs/react/recipes/authentication). There are even tools that automatically generate the necessary mutations for your GraphQL schema such as [Prisma](https://www.prisma.io/docs/1.33/get-started/01-setting-up-prisma-new-database-TYPESCRIPT-t002/)!
+
+Anyways, hope this tutorial was helpful. Email [me](21ianh1@tas.tw) if you have any further questions!
+
 ## References
 
-https://medium.com/devgorilla/what-is-graphql-f0902a959e4
-https://www.udemy.com/graphql-bootcamp/
+- [GraphQL Introduction](https://medium.com/devgorilla/what-is-graphql-f0902a959e4)
+- [Modern GraphQL Course](https://www.udemy.com/graphql-bootcamp/)
+- [React Apollo](https://www.apollographql.com/docs/react/essentials/get-started)
