@@ -18,6 +18,9 @@ After this tutorial, you will be able to:
    - [Mutations](#Mutations)
    - [Subscriptions](#Subscriptions)
 6. [React-Apollo](#Apollo-Client)
+   - [Setting up Apollo Client](#Setting-up-Apollo-client)
+   - [Querying and Subscribing](#Querying-and-Subscribing)
+   - [Mutating](#Mutating)
 7. [Wrapping Up](#Wrapping-Up)
 8. [References](#References)
 
@@ -474,6 +477,16 @@ In this example, I created an application that contains a form and a list of pos
 ![](https://i.imgur.com/EZOvDS4.png)
 
 Before I start explaining the magic behind this, I strongly recommend you read the [react-apollo](https://www.apollographql.com/docs/react/essentials/get-started) documentations. It is well documented, and you will definitely learn a lot from it.
+
+In order to run the live exmaple above, run the commands below:
+
+```bash
+cd frontend
+
+npm install
+
+npm start
+```
 
 ### Setting up Apollo client
 
