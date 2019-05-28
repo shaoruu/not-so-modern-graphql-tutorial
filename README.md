@@ -278,7 +278,7 @@ createUser(parent, args, context, info) {
     ...args.data
   }
 
-  // Save (append) it to face database
+  // Save (append) it to fake database
   db.users.push(user)
 
   return user
