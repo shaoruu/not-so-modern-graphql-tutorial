@@ -28,7 +28,7 @@ After this tutorial, you will be able to:
 
 Before we start, let me give you a brief introduction to GraphQL. GraphQL is a _query language_ for API's. It is a more efficient alternative to traditional RESTful API's since it is:
 
-- **Faster** - with user-defined specification for data fetching,, GraphQL prevents clients from underfetching or overfetching, making network requests more efficient.
+- **Faster** - with user-defined specification for data fetching, GraphQL prevents clients from underfetching or overfetching, making network requests more efficient.
 - **More Flexible** - user can define their own schemas and data types to share between frontend and backend.
 - **Faster Production** - with schemas acting as a contract for data fetching between the frontend team and backend team, both teams can do their individual work without further communication.
 
@@ -478,7 +478,7 @@ In this example, I created an application that contains a form and a list of pos
 
 Before I start explaining the magic behind this, I strongly recommend you read the [react-apollo](https://www.apollographql.com/docs/react/essentials/get-started) documentations. It is well documented, and you will definitely learn a lot from it.
 
-In order to run the live exmaple above, run the commands below:
+In order to run the live example above, run the commands below:
 
 ```bash
 cd frontend
