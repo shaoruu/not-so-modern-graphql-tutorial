@@ -28,7 +28,7 @@ After this tutorial, you will be able to:
 
 Before we start, let me give you a brief introduction to GraphQL. GraphQL is a _query language_ for API's. It is a more efficient alternative to traditional RESTful API's since it is:
 
-- **Faster** - with user-defined specification for data fetching,, GraphQL prevents clients from underfetching or overfetching, making network requests more efficient.
+- **Faster** - with user-defined specification for data fetching, GraphQL prevents clients from underfetching or overfetching, making network requests more efficient.
 - **More Flexible** - user can define their own schemas and data types to share between frontend and backend.
 - **Faster Production** - with schemas acting as a contract for data fetching between the frontend team and backend team, both teams can do their individual work without further communication.
 
