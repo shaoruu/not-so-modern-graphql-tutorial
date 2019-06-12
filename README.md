@@ -61,21 +61,21 @@ After cloning the repository, run `npm start` and navigate to http://localhost:4
 ```javascript
 // backend/src/index.js
 
-import { GraphQLServer, PubSub } from 'graphql-yoga'
-import db from './db'
-import Query from './resolvers/Query'
-import Mutation from './resolvers/Mutation'
-import Subscription from './resolvers/Subscription'
-import User from './resolvers/User'
-import Post from './resolvers/Post'
-import Comment from './resolvers/Comment'
+import { GraphQLServer, PubSub } from "graphql-yoga";
+import db from "./db";
+import Query from "./resolvers/Query";
+import Mutation from "./resolvers/Mutation";
+import Subscription from "./resolvers/Subscription";
+import User from "./resolvers/User";
+import Post from "./resolvers/Post";
+import Comment from "./resolvers/Comment";
 
 // This will be covered later.
-const pubsub = new PubSub()
+const pubsub = new PubSub();
 
 // Don't worry about anything; just know that this initializes the server.
 const server = new GraphQLServer({
-  typeDefs: './src/schema.graphql',
+  typeDefs: "./src/schema.graphql",
   resolvers: {
     Query,
     Mutation,
@@ -88,12 +88,12 @@ const server = new GraphQLServer({
     db,
     pubsub
   }
-})
+});
 
 // Serving server on port 4000
 server.start({ port: process.env.PORT | 4000 }, () => {
-  console.log(`The server is up on port ${process.env.PORT | 4000}!`)
-})
+  console.log(`The server is up on port ${process.env.PORT | 4000}!`);
+});
 ```
 
 ## Basic Syntax
@@ -118,7 +118,7 @@ Lets start from the beginning. The out-most layer `query { }` specifies that the
 
 On the second layer, we have the specific _query_ to run called `users { }`. This tells the server which kind of data the client wants, and lets the server know what to do accordingly.
 
-Lastly, within the `users` query we have the specific attributes that we are fetching for **EACH** user, in this case we are trying to fetch the `username`, `password` and `credit card number`.
+Lastly, within the `users` query we have the specific attributes that we are fetching for **EACH** user, in this case we are trying to fetch the `username`, `password` and `creditCardNumber`.
 
 ## Schema
 
@@ -354,14 +354,14 @@ Looking back to index.js, we can now clearly see the initialization of a `PubSub
 ```javascript
 // backend/src/index.js
 
-import { GraphQLServer, PubSub } from 'graphql-yoga'
+import { GraphQLServer, PubSub } from "graphql-yoga";
 
 // ...import...lots...of...files...
 
-const pubsub = new PubSub()
+const pubsub = new PubSub();
 
 const server = new GraphQLServer({
-  typeDefs: './src/schema.graphql',
+  typeDefs: "./src/schema.graphql",
   resolvers: {
     Query,
     Mutation,
@@ -374,7 +374,7 @@ const server = new GraphQLServer({
     db,
     pubsub
   }
-})
+});
 ```
 
 Now you may wonder what the `context` option is for. If you look closely to resolver functions of the multiple examples above, you may notice a sequence of <i>weird</i> function arguments `parent`, `args`, `context` and `info`. This is where the `context` keyword comes in play. By passing both the `pubsub` instance and `db` into `context`, we can use them within our resolvers later on.
@@ -387,18 +387,18 @@ However, the PubSub system isn't as easily set up as you thought. In order to se
 const Subscription = {
   comment: {
     subscribe(parent, { postId }, { db, pubsub }, info) {
-      const post = db.posts.find(post => post.id === postId && post.published)
+      const post = db.posts.find(post => post.id === postId && post.published);
 
       if (!post) {
-        throw new Error('Post not found')
+        throw new Error("Post not found");
       }
 
-      return pubsub.asyncIterator(`comment ${postId}`)
+      return pubsub.asyncIterator(`comment ${postId}`);
     }
   }
-}
+};
 
-export { Subscription as default }
+export { Subscription as default };
 ```
 
 Here I directly destructure `db` and `pubsub` out of `context`, and extract `postId` from the original argument `arguments`. I then check if the post exists or not. If it doesn't, I throw an Error to the console. If it does exit, and here comes the tricky part, I create and return a `pubsub asyncIterator` with a specific tag of `comment ${postId}`. You can think of this with the YouTube subscription example. Creating an `asyncIterator` is like creating a new YouTube channel. Later on you can then post data onto `pubsub` with the specific _channel tag_, and the data will be broadcasted to all instances connected.
@@ -543,7 +543,7 @@ Querying in [react-apollo](https://www.apollographql.com/docs/react/essentials/g
 ```javascript
 // frontend/src/graphql/queries.js
 
-import { gql } from 'apollo-boost'
+import { gql } from "apollo-boost";
 
 export const POSTS_QUERY = gql`
   query {
@@ -556,7 +556,7 @@ export const POSTS_QUERY = gql`
       published
     }
   }
-`
+`;
 
 // frontend/src/graphql/subscriptions.js
 
@@ -574,7 +574,7 @@ export const POSTS_SUBSCRIPTION = gql`
       }
     }
   }
-`
+`;
 ```
 
 ```jsx
@@ -622,7 +622,7 @@ Mutating in Apollo is also very simple. The [`Mutation`](https://www.apollograph
 ```javascript
 // frontend/src/graphql/mutations.js
 
-import { gql } from 'apollo-boost'
+import { gql } from "apollo-boost";
 
 export const CREATE_POST_MUTATION = gql`
   mutation createPost(
@@ -647,7 +647,7 @@ export const CREATE_POST_MUTATION = gql`
       published
     }
   }
-`
+`;
 ```
 
 The variables with names are just variables that you can pass into later on with the `variables` option. (you will see it later)
@@ -674,11 +674,11 @@ Last thing to do after setting up the mutation is to fire the mutation every tim
 // frontend/src/container/App/App.js
 
 handleFormSubmit = e => {
-  e.preventDefault()
+  e.preventDefault();
 
-  const { formTitle, formBody } = this.state
+  const { formTitle, formBody } = this.state;
 
-  if (!formTitle || !formBody) return
+  if (!formTitle || !formBody) return;
 
   this.createPost({
     variables: {
@@ -687,13 +687,13 @@ handleFormSubmit = e => {
       published: true,
       authorId: 2
     }
-  })
+  });
 
   this.setState({
-    formTitle: '',
-    formBody: ''
-  })
-}
+    formTitle: "",
+    formBody: ""
+  });
+};
 ```
 
 ## Wrapping Up
