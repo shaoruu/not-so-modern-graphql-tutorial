@@ -118,7 +118,7 @@ Lets start from the beginning. The out-most layer `query { }` specifies that the
 
 On the second layer, we have the specific _query_ to run called `users { }`. This tells the server which kind of data the client wants, and lets the server know what to do accordingly.
 
-Lastly, within the `users` query we have the specific attributes that we are fetching for **EACH** user, in this case we are trying to fetch the `username`, `password` and `credit card number`.
+Lastly, within the `users` query we have the specific attributes that we are fetching for **EACH** user, in this case we are trying to fetch the `username`, `password` and `creditCardNumber`.
 
 ## Schema
 
