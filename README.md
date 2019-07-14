@@ -47,7 +47,7 @@ git clone https://github.com/ian13456/modern-graphql-tutorial.git
 
 cd modern-graphql-tutorial/backend
 
-npm install
+yarn
 ```
 
 I will walk you through each file later on and teach you what it's for.
@@ -56,7 +56,7 @@ I will walk you through each file later on and teach you what it's for.
 
 One awesome tool that comes with [graphql-yoga](https://github.com/prisma/graphql-yoga) is [GraphQL Playground](https://github.com/prisma/graphql-playground). GraphQL Playground allows us to test our schemas without having to set up a client side. Essentially, it serves as a GraphQL client to run [queries](#Queries) and [mutations](#Mutations) on.
 
-After cloning the repository, run `npm start` and navigate to http://localhost:4000. Don't worry. At this point it is normal to have zero clue about what the playground is all about. Pasted below is the process of setting up a simple GraphQLServer and serving it on port 4000. Disregard the imports as they will be discussed later on. All you have to know is that the following section of code sets you up with a working GraphQLServer.
+After cloning the repository, run `yarn start` and navigate to http://localhost:4000. Don't worry. At this point it is normal to have zero clue about what the playground is all about. Pasted below is the process of setting up a simple GraphQLServer and serving it on port 4000. Disregard the imports as they will be discussed later on. All you have to know is that the following section of code sets you up with a working GraphQLServer.
 
 ```javascript
 // backend/src/index.js
@@ -483,9 +483,9 @@ In order to run the live exmaple above, run the commands below:
 ```bash
 cd frontend
 
-npm install
+yarn
 
-npm start
+yarn start
 ```
 
 ### Setting up Apollo client
@@ -632,12 +632,7 @@ export const CREATE_POST_MUTATION = gql`
     $authorId: ID!
   ) {
     createPost(
-      data: {
-        title: $title
-        body: $body
-        published: $published
-        author: $authorId
-      }
+      data: { title: $title, body: $body, published: $published, author: $authorId }
     ) {
       title
       body
