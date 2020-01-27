@@ -1,5 +1,7 @@
 # Modern GraphQL Tutorial
 
+### *ALERT: This tutorial is not updated to using React Hooks*
+
 After this tutorial, you will be able to:
 
 - Create your own GraphQL schema
