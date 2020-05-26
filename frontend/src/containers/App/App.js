@@ -1,5 +1,4 @@
-import React, { useEffect, Component, useCallback, useState } from 'react'
-import { Query, Mutation } from 'react-apollo'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import {
   Container,
