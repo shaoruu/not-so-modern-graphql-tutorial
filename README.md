@@ -614,7 +614,7 @@ useEffect(() => {
 </Col>
 ```
 
-Here, I used the `useQuery` hook provided by [@apollo/react-hooks](https://www.apollographql.com/docs/react/api/react-hooks/) and passd in my `POSTS_QUERY`. By doing so, GraphQL fires a `GET` request to the backend once the component is mounted, and I can then render whatever is returned with `data`. One thing to notice is the `subscribeToMore` function.
+Here, I used the [`useQuery`](https://www.apollographql.com/docs/react/api/react-hooks/#usequery) hook provided by [@apollo/react-hooks](https://www.apollographql.com/docs/react/api/react-hooks/) and passd in my `POSTS_QUERY`. By doing so, GraphQL fires a `GET` request to the backend once the component is mounted, and I can then render whatever is returned with `data`. One thing to notice is the `subscribeToMore` function.
 
 The [`subscribeToMore`](https://www.apollographql.com/docs/react/advanced/subscriptions#subscribe-to-more) function is what tells the GraphQL client to listen to any updates. Once an update is sent from backend through wsLink to the client, the `updateQuery` function in subscribeToMore gets executed. It basically takes the **cached** posts from the query, `prev`, append the freshly received post onto it, and put the `prev` cache back in place.
 
@@ -660,7 +660,7 @@ The variables with names are just variables that you can pass into later on with
 const [addPost] = useMutation(CREATE_POST_MUTATION)
 ```
 
-I also created a callback, `handleFormSubmit`, which is run everytime the form is submitted. This callback uses `formTitle` and `formBody`, which are just simple react `useState`'s. Basically, useMutation returns an array, containing a function that you can call to make `POST` requests to the server.
+I also created a callback, `handleFormSubmit`, which is run everytime the form is submitted. This callback uses `formTitle` and `formBody`, which are just simple react `useState`'s. Basically, [`useMutation`](https://www.apollographql.com/docs/react/api/react-hooks/#usemutation) returns an array, containing a function that you can call to make `POST` requests to the server.
 
 ```jsx
 // frontend/src/container/App/App.js
