@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
+import React, { useEffect, Component, useCallback, useState } from 'react'
 import { Query, Mutation } from 'react-apollo'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import {
   Container,
   Row,
@@ -19,120 +20,105 @@ import {
 import Post from '../../components/Post/Post'
 import classes from './App.module.css'
 
-let unsubscribe = null
+const App = () => {
+  const [formTitle, setFormTitle] = useState('')
+  const [formBody, setFormBody] = useState('')
 
-class App extends Component {
-  state = {
-    formTitle: '',
-    formBody: ''
-  }
+  const { loading, error, data, subscribeToMore } = useQuery(POSTS_QUERY)
+  const [addPost] = useMutation(CREATE_POST_MUTATION)
 
-  handleFormSubmit = e => {
-    e.preventDefault()
+  useEffect(() => {
+    subscribeToMore({
+      document: POSTS_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev
+        const newPost = subscriptionData.data.post.data
 
-    const { formTitle, formBody } = this.state
-
-    if (!formTitle || !formBody) return
-
-    this.createPost({
-      variables: {
-        title: formTitle,
-        body: formBody,
-        published: true,
-        authorId: 2
+        return {
+          ...prev,
+          posts: [newPost, ...prev.posts]
+        }
       }
     })
+  }, [subscribeToMore])
 
-    this.setState({
-      formTitle: '',
-      formBody: ''
-    })
-  }
+  const handleFormSubmit = useCallback(
+    (e) => {
+      e.preventDefault()
 
-  render() {
-    return (
-      <Container>
-        <Row>
-          <Col>
-            <h1 className={classes.title}>Modern GraphQL Tutorial</h1>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs="6" className={classes.form}>
-            <Mutation mutation={CREATE_POST_MUTATION}>
-              {createPost => {
-                this.createPost = createPost
+      if (!formTitle || !formBody) return
 
-                return (
-                  <Form onSubmit={this.handleFormSubmit}>
-                    <FormGroup row>
-                      <Label for="title" sm={2}>
-                        Title
-                      </Label>
-                      <Col sm={10}>
-                        <Input
-                          name="title"
-                          value={this.state.formTitle}
-                          id="title"
-                          placeholder="Post title..."
-                          onChange={e =>
-                            this.setState({ formTitle: e.target.value })
-                          }
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for="body">Body</Label>
-                      <Input
-                        type="textarea"
-                        name="body"
-                        value={this.state.formBody}
-                        id="body"
-                        placeholder="Post body..."
-                        onChange={e =>
-                          this.setState({ formBody: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <Button type="submit" color="primary">
-                      Post!
-                    </Button>
-                  </Form>
-                )
-              }}
-            </Mutation>
-          </Col>
-          <Col xs="6">
-            <Query query={POSTS_QUERY}>
-              {({ loading, error, data, subscribeToMore }) => {
-                if (loading) return <p>Loading...</p>
-                if (error) return <p>Error :(((</p>
+      addPost({
+        variables: {
+          title: formTitle,
+          body: formBody,
+          published: true,
+          authorId: 2
+        }
+      })
 
-                const posts = data.posts.map((post, id) => (
-                  <Post data={post} key={id} />
-                ))
-                if (!unsubscribe)
-                  unsubscribe = subscribeToMore({
-                    document: POSTS_SUBSCRIPTION,
-                    updateQuery: (prev, { subscriptionData }) => {
-                      if (!subscriptionData.data) return prev
-                      const newPost = subscriptionData.data.post.data
+      setFormTitle('')
+      setFormBody('')
+    },
+    [addPost, formTitle, formBody]
+  )
 
-                      return {
-                        ...prev,
-                        posts: [newPost, ...prev.posts]
-                      }
-                    }
-                  })
-
-                return <div>{posts}</div>
-              }}
-            </Query>
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <Row>
+        <Col>
+          <h1 className={classes.title}>Modern GraphQL Tutorial</h1>
+        </Col>
+      </Row>
+      <Row>
+        <Col xs="6" className={classes.form}>
+          <Form onSubmit={handleFormSubmit}>
+            <FormGroup row>
+              <Label for="title" sm={2}>
+                Title
+              </Label>
+              <Col sm={10}>
+                <Input
+                  name="title"
+                  value={formTitle}
+                  id="title"
+                  placeholder="Post title..."
+                  onChange={(e) => setFormTitle(e.target.value)}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Label for="body">Body</Label>
+              <Input
+                type="textarea"
+                name="body"
+                value={formBody}
+                id="body"
+                placeholder="Post body..."
+                onChange={(e) => setFormBody(e.target.value)}
+              />
+            </FormGroup>
+            <Button
+              type="submit"
+              color="primary"
+              disabled={formTitle === '' || formBody === ''}
+            >
+              Post!
+            </Button>
+          </Form>
+        </Col>
+        <Col xs="6">
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p>Error :(((</p>
+          ) : (
+            data.posts.map((post, id) => <Post data={post} key={id} />)
+          )}
+        </Col>
+      </Row>
+    </Container>
+  )
 }
 
 export default App
