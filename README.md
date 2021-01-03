@@ -9,20 +9,24 @@ After this tutorial, you will be able to:
 
 ## Table of Contents
 
-1. [Introduction](#Introduction)
-2. [Getting Started](#Getting-Started)
-3. [Basic Syntax](#Basic-Syntax)
-4. [GraphQL Playground](#GraphQL-Playground)
-5. [Queries, Mutations and Subscriptions](#Queries-Mutations-and-Subscriptions)
-   - [Queries](#Queries)
-   - [Mutations](#Mutations)
-   - [Subscriptions](#Subscriptions)
-6. [React-Apollo](#Apollo-Client)
-   - [Setting up Apollo Client](#Setting-up-Apollo-client)
-   - [Querying and Subscribing](#Querying-and-Subscribing)
-   - [Mutating](#Mutating)
-7. [Wrapping Up](#Wrapping-Up)
-8. [References](#References)
+- [Modern GraphQL Tutorial](#modern-graphql-tutorial)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Getting Started](#getting-started)
+  - [GraphQL Playground](#graphql-playground)
+  - [Basic Syntax](#basic-syntax)
+  - [Schema](#schema)
+    - [Basic Types:](#basic-types)
+  - [Queries, Mutations and Subscriptions](#queries-mutations-and-subscriptions)
+    - [Queries](#queries)
+    - [Mutations](#mutations)
+    - [Subscriptions](#subscriptions)
+  - [Apollo Client](#apollo-client)
+    - [Setting up Apollo client](#setting-up-apollo-client)
+    - [Querying and Subscribing](#querying-and-subscribing)
+    - [Mutating](#mutating)
+  - [Wrapping Up](#wrapping-up)
+  - [References](#references)
 
 ## Introduction
 
@@ -495,12 +499,15 @@ In order to connect to the backend API, you need to set up a _GraphQL client_ li
 ```javascript
 // frontend/src/index.js
 
-import { ApolloClient, InMemoryCache } from 'apollo-boost'
-import { ApolloProvider } from 'react-apollo'
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink
+} from '@apollo/client'
 import { split } from 'apollo-link'
-import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
-import { getMainDefinition } from 'apollo-utilities
+import { getMainDefinition } from 'apollo-utilities'
 
 // Create an http link:
 const httpLink = new HttpLink({
@@ -543,7 +550,7 @@ Querying in [react-apollo](https://www.apollographql.com/docs/react/essentials/g
 ```javascript
 // frontend/src/graphql/queries.js
 
-import { gql } from 'apollo-boost'
+import { gql } from '@apollo/client'
 
 export const POSTS_QUERY = gql`
   query {
@@ -625,7 +632,7 @@ Mutating in Apollo is also very simple. The [`Mutation`](https://www.apollograph
 ```javascript
 // frontend/src/graphql/mutations.js
 
-import { gql } from 'apollo-boost'
+import { gql } from '@apollo/client'
 
 export const CREATE_POST_MUTATION = gql`
   mutation createPost(
