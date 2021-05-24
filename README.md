@@ -60,7 +60,7 @@ I will walk you through each file later on and teach you what it's for.
 
 One awesome tool that comes with [graphql-yoga](https://github.com/prisma/graphql-yoga) is [GraphQL Playground](https://github.com/prisma/graphql-playground). GraphQL Playground allows us to test our schemas without having to set up a client side. Essentially, it serves as a GraphQL client to run [queries](#Queries) and [mutations](#Mutations) on.
 
-After cloning the repository, run `yarn start` and navigate to http://localhost:4000. Don't worry. At this point it is normal to have zero clue about what the playground is all about. Pasted below is the process of setting up a simple GraphQLServer and serving it on port 4000. Disregard the imports as they will be discussed later on. All you have to know is that the following section of code sets you up with a working GraphQLServer.
+After cloning the repository, run `yarn start` and navigate to http://localhost:5000. Don't worry. At this point it is normal to have zero clue about what the playground is all about. Pasted below is the process of setting up a simple GraphQLServer and serving it on port 5000. Disregard the imports as they will be discussed later on. All you have to know is that the following section of code sets you up with a working GraphQLServer.
 
 ```javascript
 // backend/src/index.js
@@ -94,9 +94,9 @@ const server = new GraphQLServer({
   }
 })
 
-// Serving server on port 4000
-server.start({ port: process.env.PORT | 4000 }, () => {
-  console.log(`The server is up on port ${process.env.PORT | 4000}!`)
+// Serving server on port 5000
+server.start({ port: process.env.PORT | 5000 }, () => {
+  console.log(`The server is up on port ${process.env.PORT | 5000}!`)
 })
 ```
 
@@ -511,12 +511,12 @@ import { getMainDefinition } from 'apollo-utilities'
 
 // Create an http link:
 const httpLink = new HttpLink({
-  uri: 'http://localhost:4000/'
+  uri: 'http://localhost:5000/'
 })
 
 // Create a WebSocket link:
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:4000/`,
+  uri: `ws://localhost:5000/`,
   options: { reconnect: true }
 })
 

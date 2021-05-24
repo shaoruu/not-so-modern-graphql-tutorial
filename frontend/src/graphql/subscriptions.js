@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client';
 
 export const POSTS_SUBSCRIPTION = gql`
   subscription {
@@ -14,4 +14,4 @@ export const POSTS_SUBSCRIPTION = gql`
       }
     }
   }
-`
+`;

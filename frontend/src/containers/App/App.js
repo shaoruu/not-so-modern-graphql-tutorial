@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback, useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import React, { useEffect, useCallback, useState } from 'react';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import {
   Container,
   Row,
@@ -8,59 +8,61 @@ import {
   FormGroup,
   Label,
   Input,
-  Button
-} from 'reactstrap'
+  Button,
+} from 'reactstrap';
 
 import {
   POSTS_QUERY,
   CREATE_POST_MUTATION,
-  POSTS_SUBSCRIPTION
-} from '../../graphql'
-import Post from '../../components/Post/Post'
-import classes from './App.module.css'
+  POSTS_SUBSCRIPTION,
+} from '../../graphql';
+import Post from '../../components/Post/Post';
+import classes from './App.module.css';
 
 const App = () => {
-  const [formTitle, setFormTitle] = useState('')
-  const [formBody, setFormBody] = useState('')
+  const [formTitle, setFormTitle] = useState('');
+  const [formBody, setFormBody] = useState('');
 
-  const { loading, error, data, subscribeToMore } = useQuery(POSTS_QUERY)
-  const [addPost] = useMutation(CREATE_POST_MUTATION)
+  const { loading, error, data, subscribeToMore } = useQuery(POSTS_QUERY);
+  const [addPost] = useMutation(CREATE_POST_MUTATION);
 
   useEffect(() => {
-    subscribeToMore({
-      document: POSTS_SUBSCRIPTION,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev
-        const newPost = subscriptionData.data.post.data
+    try {
+      subscribeToMore({
+        document: POSTS_SUBSCRIPTION,
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev;
+          const newPost = subscriptionData.data.post.data;
 
-        return {
-          ...prev,
-          posts: [newPost, ...prev.posts]
-        }
-      }
-    })
-  }, [subscribeToMore])
+          return {
+            ...prev,
+            posts: [newPost, ...prev.posts],
+          };
+        },
+      });
+    } catch (e) {}
+  }, [subscribeToMore]);
 
   const handleFormSubmit = useCallback(
     (e) => {
-      e.preventDefault()
+      e.preventDefault();
 
-      if (!formTitle || !formBody) return
+      if (!formTitle || !formBody) return;
 
       addPost({
         variables: {
           title: formTitle,
           body: formBody,
           published: true,
-          authorId: 2
-        }
-      })
+          authorId: 2,
+        },
+      });
 
-      setFormTitle('')
-      setFormBody('')
+      setFormTitle('');
+      setFormBody('');
     },
-    [addPost, formTitle, formBody]
-  )
+    [addPost, formTitle, formBody],
+  );
 
   return (
     <Container>
@@ -117,7 +119,7 @@ const App = () => {
         </Col>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
-export default App
+export default App;
