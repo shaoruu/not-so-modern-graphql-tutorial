@@ -32,7 +32,7 @@ const yoga = createYoga({
     db,
     pubsub,
   },
-  //  graphqlEndpoint: '/',   // uncomment this to send the app to: 5000/
+  //  graphqlEndpoint: '/',   // uncomment this to send the app to: 4000/
   graphiql: {
     subscriptionsProtocol: 'WS',
   },
@@ -78,7 +78,7 @@ useServer(
   wsServer,
 )
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 server.listen({port}, () => {
   console.log(`The server is up on port ${port}!`);
 });
