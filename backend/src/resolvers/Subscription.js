@@ -9,12 +9,12 @@ const Subscription = {
         throw new Error('Post not found');
       }
 
-      return pubsub.asyncIterator(`comment ${postId}`);
+      return pubsub.subscribe(`comment ${postId}`);
     },
   },
   post: {
     subscribe(parent, args, { pubsub }, info) {
-      return pubsub.asyncIterator('post');
+      return pubsub.subscribe('post');
     },
   },
 };
