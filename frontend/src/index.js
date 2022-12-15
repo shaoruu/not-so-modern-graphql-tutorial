@@ -1,14 +1,16 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
+  split,
   HttpLink,
 } from '@apollo/client';
-import { split } from 'apollo-link';
-import { WebSocketLink } from 'apollo-link-ws';
-import { getMainDefinition } from 'apollo-utilities';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './index.css';
@@ -17,14 +19,14 @@ import reportWebVitals from './reportWebVitals';
 
 // Create an http link:
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5000/',
+  uri: 'http://localhost:5001/graphql',
 });
 
 // Create a WebSocket link:
-const wsLink = new WebSocketLink({
-  uri: `ws://localhost:5000/`,
+const wsLink = new GraphQLWsLink(createClient({
+  url: 'ws://localhost:5001/graphql',
   options: { reconnect: true },
-});
+}));
 
 // using the ability to split links, you can send data to each link
 // depending on what kind of operation is being sent
@@ -43,16 +45,16 @@ const link = split(
 
 const client = new ApolloClient({
   link,
-  cache: new InMemoryCache().restore({}),
+  cache: new InMemoryCache(),
 });
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <App />
     </ApolloProvider>
-  </React.StrictMode>,
-  document.getElementById('root'),
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
