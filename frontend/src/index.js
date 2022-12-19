@@ -19,12 +19,12 @@ import reportWebVitals from './reportWebVitals';
 
 // Create an http link:
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5001/graphql',
+  uri: 'http://localhost:4000/graphql',
 });
 
 // Create a WebSocket link:
 const wsLink = new GraphQLWsLink(createClient({
-  url: 'ws://localhost:5001/graphql',
+  url: 'ws://localhost:4000/graphql',
   options: { reconnect: true },
 }));
 
