@@ -1,3 +1,5 @@
+# IMPORTANT NOTE: THIS WAS *MORDERN* IN 2019, VERY OUTDATED NOW!!
+
 # Modern GraphQL Tutorial
 
 After this tutorial, you will be able to:
